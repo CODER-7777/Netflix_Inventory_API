@@ -193,6 +193,8 @@ int main() {
             item["id"] = r.id;
             item["content_id"] = r.content_id;
             item["content_type"] = r.content_type;
+            item["start_date"] = r.start_date;
+            item["due_date"] = r.due_date;
             item["cost"] = r.cost;
             rent_list.push_back(std::move(item));
         }
