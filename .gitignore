@@ -1,0 +1,11 @@
+Important_Notes.md
+build/
+CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.o
+*.a
+*.so
+.DS_Store
