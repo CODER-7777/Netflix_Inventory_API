@@ -25,4 +25,25 @@ public:
     void addTVShow(const TVShow& tvshow) {
         storage->addTVShow(tvshow);
     }
+
+    void removeMovie(int id) {
+        storage->removeMovie(id);
+    }
+
+    void removeTVShow(int id) {
+        storage->removeTVShow(id);
+    }
+
+    std::vector<std::shared_ptr<Movie>> searchMovies(const std::string& query) {
+        auto all = storage->getAllMovies();
+        if (query.empty()) return all;
+        
+        std::vector<std::shared_ptr<Movie>> filtered;
+        for (const auto& m : all) {
+            if (m->title.find(query) != std::string::npos || m->genre.find(query) != std::string::npos) {
+                filtered.push_back(m);
+            }
+        }
+        return filtered;
+    }
 };

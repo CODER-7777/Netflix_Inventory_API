@@ -62,10 +62,12 @@ int main() {
         return crow::response(401, "Invalid credentials");
     });
 
-    // Catalog Routes
+    // Catalog Routes - Movies
     CROW_ROUTE(app, "/api/movies").methods("GET"_method)
-    ([catalogService]() {
-        auto movies = catalogService->getMovies();
+    ([catalogService](const crow::request& req) {
+        std::string search_query = req.url_params.get("search") ? req.url_params.get("search") : "";
+        auto movies = catalogService->searchMovies(search_query);
+        
         crow::json::wvalue::list res_list;
         for (const auto& m : movies) {
             crow::json::wvalue item;
@@ -98,7 +100,52 @@ int main() {
         return crow::response(201, "Movie added");
     });
 
-    // Rental Routes
+    CROW_ROUTE(app, "/api/movies/<int>").methods("DELETE"_method)
+    ([catalogService](int id){
+        catalogService->removeMovie(id);
+        return crow::response(200, "Movie deleted");
+    });
+
+    // Catalog Routes - TV Shows
+    CROW_ROUTE(app, "/api/tvshows").methods("GET"_method)
+    ([catalogService]() {
+        // We'll just fetch all for now
+        auto tvshows = catalogService->getTVShows();
+        crow::json::wvalue::list res_list;
+        for (const auto& m : tvshows) {
+            crow::json::wvalue item;
+            item["id"] = m->id;
+            item["title"] = m->title;
+            item["seasons"] = m->seasons;
+            item["episodes_per_season"] = m->episodes_per_season;
+            item["rent_per_season"] = m->rent_per_season;
+            res_list.push_back(std::move(item));
+        }
+        return crow::response(crow::json::wvalue(res_list));
+    });
+
+    CROW_ROUTE(app, "/api/tvshows").methods("POST"_method)
+    ([catalogService](const crow::request& req){
+        auto x = crow::json::load(req.body);
+        if (!x) return crow::response(400);
+        
+        TVShow m;
+        m.title = x["title"].s();
+        m.seasons = x["seasons"].i();
+        m.episodes_per_season = x["episodes_per_season"].i();
+        m.rent_per_season = x["rent_per_season"].i();
+
+        catalogService->addTVShow(m);
+        return crow::response(201, "TV Show added");
+    });
+
+    CROW_ROUTE(app, "/api/tvshows/<int>").methods("DELETE"_method)
+    ([catalogService](int id){
+        catalogService->removeTVShow(id);
+        return crow::response(200, "TV Show deleted");
+    });
+
+    // Rental & Purchase Routes
     CROW_ROUTE(app, "/api/rentals").methods("POST"_method)
     ([rentalService](const crow::request& req){
         auto x = crow::json::load(req.body);
@@ -112,6 +159,60 @@ int main() {
 
         rentalService->rentContent(user_id, content_id, type, months, cost);
         return crow::response(201, "Rented successfully");
+    });
+
+    CROW_ROUTE(app, "/api/rentals/<int>").methods("DELETE"_method)
+    ([rentalService](int id){
+        rentalService->returnRental(id);
+        return crow::response(200, "Rental returned");
+    });
+
+    CROW_ROUTE(app, "/api/purchases").methods("POST"_method)
+    ([rentalService](const crow::request& req){
+        auto x = crow::json::load(req.body);
+        if (!x) return crow::response(400);
+
+        int user_id = x["user_id"].i();
+        int content_id = x["content_id"].i();
+        std::string type = x["content_type"].s();
+        int cost = x["cost"].i();
+
+        rentalService->purchaseContent(user_id, content_id, type, cost);
+        return crow::response(201, "Purchased successfully");
+    });
+
+    // User Dashboard
+    CROW_ROUTE(app, "/api/users/<int>/dashboard").methods("GET"_method)
+    ([rentalService](int user_id){
+        crow::json::wvalue res;
+        
+        auto rentals = rentalService->getUserRentals(user_id);
+        crow::json::wvalue::list rent_list;
+        for (const auto& r : rentals) {
+            crow::json::wvalue item;
+            item["id"] = r.id;
+            item["content_id"] = r.content_id;
+            item["content_type"] = r.content_type;
+            item["cost"] = r.cost;
+            rent_list.push_back(std::move(item));
+        }
+
+        auto purchases = rentalService->getUserPurchases(user_id);
+        crow::json::wvalue::list purch_list;
+        for (const auto& p : purchases) {
+            crow::json::wvalue item;
+            item["id"] = p.id;
+            item["content_id"] = p.content_id;
+            item["content_type"] = p.content_type;
+            item["cost"] = p.cost;
+            purch_list.push_back(std::move(item));
+        }
+
+        res["rentals"] = std::move(rent_list);
+        res["purchases"] = std::move(purch_list);
+        res["total_charges"] = rentalService->calculateTotalCharges(user_id);
+
+        return crow::response(res);
     });
 
     app.port(8080).multithreaded().run();

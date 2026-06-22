@@ -1,4 +1,4 @@
-#  Netflix Inventory API
+# Netflix Inventory API
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)
 ![Crow](https://img.shields.io/badge/Framework-Crow-orange)
@@ -15,7 +15,7 @@ The application strictly adheres to the **Controller-Service-Repository** patter
 
 ```mermaid
 graph TD
-    Client([💻 API Client / Frontend])
+    Client([API Client / Frontend])
     
     subgraph "Dockerized C++ API Server (Crow)"
         Controller[Controller Layer\nHTTP Routing & JSON Validation]
@@ -27,13 +27,13 @@ graph TD
         Service <-->|CRUD Operations| Repo
     end
     
-    DB[( PostgreSQL\nACID Compliant)]
+    DB[(PostgreSQL\nACID Compliant)]
     Repo <-->|libpqxx SQL Queries| DB
 ```
 
 ---
 
-##  Key Features
+## Key Features
 
 - **Memory Safety via RAII:** Eliminates memory leaks and undefined behavior by enforcing strict modern C++ RAII principles and `std::shared_ptr` ownership models.
 - **SOLID Design:** Designed with a highly extensible, interface-driven codebase. New subscription models or content types can be injected without modifying underlying routing or database layers.
@@ -86,10 +86,10 @@ erDiagram
 
 ---
 
-##  Getting Started
+## Getting Started
 
 ### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine + Docker Compose
+- Docker Desktop or Docker Engine + Docker Compose
 
 ### Build and Run
 
@@ -110,7 +110,7 @@ erDiagram
 
 ---
 
-##  API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/register` - Register a new user

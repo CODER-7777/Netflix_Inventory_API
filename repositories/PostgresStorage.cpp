@@ -150,3 +150,70 @@ std::vector<Rental> PostgresStorage::getRentalsByUser(int user_id) {
     }
     return rentals;
 }
+
+void PostgresStorage::removeMovie(int id) {
+    try {
+        pqxx::connection c(conn_str);
+        pqxx::work w(c);
+        w.exec_params("DELETE FROM movies WHERE id = $1", id);
+        w.commit();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+void PostgresStorage::removeTVShow(int id) {
+    try {
+        pqxx::connection c(conn_str);
+        pqxx::work w(c);
+        w.exec_params("DELETE FROM tv_shows WHERE id = $1", id);
+        w.commit();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+void PostgresStorage::removeRental(int id) {
+    try {
+        pqxx::connection c(conn_str);
+        pqxx::work w(c);
+        w.exec_params("DELETE FROM rentals WHERE id = $1", id);
+        w.commit();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+void PostgresStorage::addPurchase(const Purchase& purchase) {
+    try {
+        pqxx::connection c(conn_str);
+        pqxx::work w(c);
+        w.exec_params("INSERT INTO purchases (user_id, content_id, content_type, cost) VALUES ($1, $2, $3, $4)", 
+                      purchase.user_id, purchase.content_id, purchase.content_type, purchase.cost);
+        w.commit();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+std::vector<Purchase> PostgresStorage::getPurchasesByUser(int user_id) {
+    std::vector<Purchase> purchases;
+    try {
+        pqxx::connection c(conn_str);
+        pqxx::work w(c);
+        pqxx::result r = w.exec_params("SELECT id, user_id, content_id, content_type, cost FROM purchases WHERE user_id = $1", user_id);
+        
+        for (auto const& row : r) {
+            Purchase p;
+            p.id = row[0].as<int>();
+            p.user_id = row[1].as<int>();
+            p.content_id = row[2].as<int>();
+            p.content_type = row[3].as<std::string>();
+            p.cost = row[4].as<int>();
+            purchases.push_back(p);
+        }
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+    return purchases;
+}

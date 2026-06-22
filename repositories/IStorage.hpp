@@ -18,8 +18,14 @@ public:
     virtual std::vector<std::shared_ptr<TVShow>> getAllTVShows() = 0;
     virtual void addMovie(const Movie& movie) = 0;
     virtual void addTVShow(const TVShow& tvshow) = 0;
+    virtual void removeMovie(int id) = 0;
+    virtual void removeTVShow(int id) = 0;
 
-    // Rental Operations
+    // Rental & Purchase Operations
     virtual void addRental(const Rental& rental) = 0;
+    virtual void removeRental(int id) = 0;
     virtual std::vector<Rental> getRentalsByUser(int user_id) = 0;
+    
+    virtual void addPurchase(const Purchase& purchase) = 0;
+    virtual std::vector<Purchase> getPurchasesByUser(int user_id) = 0;
 };

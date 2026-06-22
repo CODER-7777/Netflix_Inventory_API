@@ -192,3 +192,24 @@ When you build a complex C++ app, it might work on your computer but crash on so
 
 > [!TIP]
 > **Where to learn:** "Docker in 100 Seconds" by Fireship on YouTube, or "Docker Compose for Beginners".
+
+---
+
+## 7. Advanced REST & Database Concepts (Feature Update)
+
+When we added the ability to **Search**, **Return**, and **Delete** content, we introduced a few new advanced topics:
+
+### HTTP DELETE Method
+When an Admin wants to remove a movie, or a user wants to "return" a rental, we don't use `POST` or `GET`. We use the `DELETE` HTTP method.
+- `DELETE /api/movies/5` tells the server to completely remove Movie #5.
+- This keeps our API predictable and follows true REST standards (CRUD: Create = POST, Read = GET, Update = PUT, Delete = DELETE).
+
+### URL Query Parameters (Searching)
+To search for a movie by name or genre, we don't want to create a whole new route like `/api/search_movies`. Instead, we use **Query Parameters** attached to our existing `GET /api/movies` route.
+- Example: `GET /api/movies?search=action`
+- In `main.cpp`, we read this using `req.url_params.get("search")`. If the user provided a search term, we filter the list; if not, we return everything.
+
+### Advanced SQL (`DELETE FROM`)
+To make returning and removing items permanent, we added `DELETE FROM` statements to `PostgresStorage.cpp`.
+- `DELETE FROM rentals WHERE id = $1;` completely wipes the rental record from the database.
+- *Best Practice:* In a real enterprise system, you might do a "Soft Delete" (e.g., `UPDATE rentals SET is_returned = true WHERE id = $1`) to keep historical records, but for this inventory system, a hard delete is perfect.
