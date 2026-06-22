@@ -1,4 +1,4 @@
-# 🎬 Netflix Inventory API
+#  Netflix Inventory API
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)
 ![Crow](https://img.shields.io/badge/Framework-Crow-orange)
@@ -9,7 +9,7 @@ A scalable, production-ready RESTful API for managing a Netflix-style streaming 
 
 ---
 
-## 🏗 System Architecture
+## System Architecture
 
 The application strictly adheres to the **Controller-Service-Repository** pattern, entirely decoupling HTTP routing logic from core business rules and database operations.
 
@@ -18,22 +18,22 @@ graph TD
     Client([💻 API Client / Frontend])
     
     subgraph "Dockerized C++ API Server (Crow)"
-        Controller[🔀 Controller Layer\nHTTP Routing & JSON Validation]
-        Service[🧠 Service Layer\nBusiness Logic & Domain Rules]
-        Repo[🗄️ Repository Layer\nIStorage Interface]
+        Controller[Controller Layer\nHTTP Routing & JSON Validation]
+        Service[Service Layer\nBusiness Logic & Domain Rules]
+        Repo[Repository Layer\nIStorage Interface]
         
         Client <-->|REST / JSON| Controller
         Controller <-->|C++ Domain Models| Service
         Service <-->|CRUD Operations| Repo
     end
     
-    DB[(🐘 PostgreSQL\nACID Compliant)]
+    DB[( PostgreSQL\nACID Compliant)]
     Repo <-->|libpqxx SQL Queries| DB
 ```
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **Memory Safety via RAII:** Eliminates memory leaks and undefined behavior by enforcing strict modern C++ RAII principles and `std::shared_ptr` ownership models.
 - **SOLID Design:** Designed with a highly extensible, interface-driven codebase. New subscription models or content types can be injected without modifying underlying routing or database layers.
@@ -43,7 +43,7 @@ graph TD
 
 ---
 
-## 🗃️ Database Schema
+## Database Schema
 
 The system uses a relational PostgreSQL schema to enforce data integrity across user authentication and rental tracking.
 
@@ -86,7 +86,7 @@ erDiagram
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine + Docker Compose
@@ -110,7 +110,7 @@ erDiagram
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### Authentication
 - `POST /api/register` - Register a new user
